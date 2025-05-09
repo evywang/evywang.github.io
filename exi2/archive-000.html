@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>档案馆藏品展示</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="./styles.css" rel="stylesheet">
+</head>
+<body class="bg-neutral font-noto text-primary min-h-screen flex flex-col">
+    <!-- 主容器 -->
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- 藏品展示区 -->
+        <main>
+            <!-- 新增的div子节点，应用bg-customBg样式 -->
+            <div class="bg-customBg rounded-1px shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
+                <!-- 标题区域 - 居中显示 -->
+                <header class="p-6 sm:p-8 text-center">
+                    <h1 class="text-center text-3xl sm:text-4xl md:text-5xl font-bold text-primary mb-2 text-shadow tracking-tight">
+                        历史之声
+                    </h1>
+                    <p class="text-center text-secondary text-base sm:text-lg md:text-xl max-w-3xl">探索历史文物背后的故事与声音</p>
+                </header>
+                
+                <!-- 藏品图片 -->
+                <div class="relative aspect-video bg-gray-100 overflow-hidden">
+                    <img src="https://picsum.photos/1200/675?random=1" alt="珍贵藏品" 
+                         class="w-full h-full object-cover transition-transform duration-700 hover:scale-105">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                </div>
+                
+                <!-- 音频控制 - 原型按钮 -->
+                <div class="flex justify-center items-center p-6">
+                    <button id="playPauseBtn" class="prototype-button">
+                        <i class="fa fa-play text-xl text-accent"></i>
+                    </button>
+                    <div id="audioWave" class="audio-wave ml-4">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 音频进度条和时间 - 移除背景，高度设置为2px -->
+            <div class="p-4 mt-4 rounded-1px">
+                <div class="flex items-center gap-3">
+                    <span id="currentTime" class="text-sm text-secondary">0:00</span>
+                    <div class="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden cursor-pointer group" id="progressContainer">
+                        <div id="progressBar" class="absolute top-0 left-0 h-full bg-accent w-0 rounded-full transition-all duration-150"></div>
+                        <div id="progressHandle" class="absolute top-1/2 left-0 w-4 h-4 bg-white rounded-1px shadow-md transform -translate-y-1/2 -translate-x-1/2 scale-0 group-hover:scale-100 transition-all duration-150"></div>
+                    </div>
+                    <span id="totalTime" class="text-sm text-secondary">0:00</span>
+                </div>
+            </div>
+
+            <!-- 藏品描述 - 移除背景 -->
+            <div class="p-6 mt-4 rounded-1px">
+                <div class="inline-block">
+                    <h2 class="text-2xl sm:text-3xl font-semibold text-primary">藏品简介</h2>
+                    <div class="title-underline"></div>
+                </div>
+                <div class="h-64 md:h-80 overflow-y-auto pr-2 scrollbar-hide" id="descriptionContainer">
+                    <p class="text-gray-700 leading-relaxed mb-4">
+                        这是一件来自明朝嘉靖年间的青花瓷器，制作工艺精湛，纹饰精美，具有极高的历史价值和艺术价值。此藏品于1956年出土于江西景德镇明代窑址，为研究明代青花瓷的制作工艺和艺术风格提供了重要的实物资料。
+                    </p>
+                    <p class="text-gray-700 leading-relaxed mb-4">
+                        青花瓷器是中国传统瓷器中的珍品，以其独特的蓝色纹饰和精湛的制作工艺闻名于世。这件藏品采用了"双勾填色"技法，纹饰线条流畅，色彩鲜艳，体现了明代青花瓷制作的高超水平。
+                    </p>
+                    <p class="text-gray-700 leading-relaxed mb-4">
+                        瓷器表面绘有精美的花鸟图案，画面布局合理，意境深远。花卉采用了写实的手法，形态逼真；鸟类则栩栩如生，展翅欲飞。整个画面充满了生机与活力，展现了明代艺术家对自然的热爱和对美好生活的向往。
+                    </p>
+                    <p class="text-gray-700 leading-relaxed mb-4">
+                        此藏品不仅是一件艺术品，更是研究明代社会、经济、文化的重要实物资料。它反映了当时的社会风貌、审美观念和工艺水平，对于了解明代历史具有重要的参考价值。
+                    </p>
+                    <p class="text-gray-700 leading-relaxed mb-4">
+                        目前，这件藏品收藏于国家博物馆，定期向公众展出，让更多的人能够欣赏到明代青花瓷的魅力。同时，文物保护专家也在对其进行持续的保护和研究，以确保这一珍贵的历史遗产能够得到妥善的保存和传承。
+                    </p>
+                </div>
+            </div>
+
+            <!-- 转发按钮和分享菜单 - 高度调整为一半 -->
+            <div class="p-3 mt-4 rounded-1px shadow-lg relative">
+                <button id="shareButton" class="share-button-prototype">
+                    <i class="fa fa-share-alt text-xs text-accent"></i>
+                    <span class="text-xs text-primary">分享</span>
+                </button>
+
+                <!-- 分享菜单 - 仅保留复制链接 -->
+                <div id="shareModal" class="share-modal absolute left-0 right-0 bottom-full mb-2 bg-white rounded-1px shadow-xl p-2 z-10 hidden">
+                    <div class="flex flex-wrap gap-3 justify-center">
+                        <button class="share-platform" data-platform="link">
+                            <div class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-white mb-1">
+                                <i class="fa fa-link text-sm"></i>
+                            </div>
+                            <span class="text-xs">复制链接</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="bg-primary text-white mt-16 py-8">
+        <div class="container mx-auto px-4 max-w-6xl">
+            <div class="flex flex-col md:flex-row justify-between">
+                <div class="md:text-left">
+                    <h3 class="text-xl sm:text-2xl font-semibold mb-2">历史之声</h3>
+                    <p class="text-gray-300 text-sm">探索历史文物背后的故事与声音</p>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-6 pt-6 text-center text-gray-400 text-sm">
+                <p>© 2025 历史之声 版权所有</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 音频元素 -->
+    <audio id="audioPlayer" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+
+    <script src="./script.js"></script>
+</body>
+</html>
