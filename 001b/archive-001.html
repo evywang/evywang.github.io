@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>西安市档案馆西安珍贵档案文献陈列展</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../style/styles.css" rel="stylesheet">
+</head>
+<body class="bg-neutral font-noto text-primary min-h-screen flex flex-col">
+    <!-- 主容器 -->
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- 藏品展示区 -->
+        <main>
+            <!-- 新增的div子节点，应用bg-customBg样式 -->
+            <div class="bg-customBg rounded-1px shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
+                <!-- 标题区域 - 居中显示 -->
+                <header class="p-6 sm:p-8 text-center">
+                    <h1 class="text-center text-3xl sm:text-4xl md:text-5xl font-bold text-primary mb-2 text-shadow tracking-tight">
+                        西安珍贵档案文献陈列展
+                    </h1>
+                    <p class="text-center text-secondary text-base sm:text-lg md:text-xl max-w-3xl">清代档案文献</p>
+                </header>
+                
+                <!-- 藏品图片 -->
+                <div class="relative aspect-video bg-gray-100 overflow-hidden">
+                    <img src="001.png" alt="第一展板" 
+                         class="w-full h-full object-cover transition-transform duration-700 hover:scale-105">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                </div>
+                
+                <!-- 音频控制 - 原型按钮 -->
+                <div class="flex justify-center items-center p-6">
+                    <button id="playPauseBtn" class="prototype-button">
+                        <i class="fa fa-play text-xl text-accent"></i>
+                    </button>
+                    <div id="audioWave" class="audio-wave ml-4">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 音频进度条和时间 - 移除背景，高度设置为2px -->
+            <div class="p-4 mt-4 rounded-1px">
+                <div class="flex items-center gap-3">
+                    <span id="currentTime" class="text-sm text-secondary">0:00</span>
+                    <div class="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden cursor-pointer group" id="progressContainer">
+                        <div id="progressBar" class="absolute top-0 left-0 h-full bg-accent w-0 rounded-full transition-all duration-150"></div>
+                        <div id="progressHandle" class="absolute top-1/2 left-0 w-4 h-4 bg-white rounded-1px shadow-md transform -translate-y-1/2 -translate-x-1/2 scale-0 group-hover:scale-100 transition-all duration-150"></div>
+                    </div>
+                    <span id="totalTime" class="text-sm text-secondary">0:00</span>
+                </div>
+            </div>
+
+            <!-- 藏品描述 - 移除背景 -->
+            <div class="p-6 mt-4 rounded-1px">
+                <div class="inline-block">
+                    <h2 class="text-2xl sm:text-3xl font-semibold text-primary">第一部分：清代档案文献</h2>
+                    <div class="title-underline"></div>
+                </div>
+                <div class="h-64 md:h-80 overflow-y-auto pr-2 scrollbar-hide" id="descriptionContainer">
+                    <p class="text-gray-700 leading-relaxed mb-4">
+                        清代中晚期的西安，为西北地区政治经济文化中心和军事重镇。我馆保存这一时期的档案，内容多为土地房屋租卖契据、钱粮账册、赋税凭单、工商文书、家谱古籍等。一张薄纸记录着土地流转的民间契约精神。清代契据主要分为红契与白契两类：红契是中国旧时不动产买卖与典当向官府纳税盖章的契约，亦称作官契；白契则是土地房屋买卖与典当的民间自写契约。我馆馆藏的清代契据则是以官契红契为主。                    </p>
+                    <p class="text-gray-700 leading-relaxed mb-4">
+                        ①展板中的这一张清乾隆十一年的土地契据是我馆馆藏最早的档案，契纸上"民人苏进贤"歪斜的字迹，诉说着三秦百姓"千年田换八百主"的生存状态。
+                    </p>
+                    <p class="text-gray-700 leading-relaxed mb-4">
+                        ②《什木罕家谱》记载满族正白旗家族迁徙史，为研究满族的族源、迁徙、家庭、祭祀等提供了宝贵资料。
+                    </p>
+                    <p class="text-gray-700 leading-relaxed mb-4">
+                        ③展柜中《周礼精华》《欧美政治要义》等典籍则折射出清末中西思想的碰撞，《云栈纪程》是古蜀道研究的珍贵资料。
+                    </p>
+                </div>
+            </div>
+
+            <!-- 转发按钮和分享菜单 - 高度调整为一半 -->
+            <div class="p-3 mt-4 rounded-1px shadow-lg relative">
+                <button id="shareButton" class="share-button-prototype">
+                    <i class="fa fa-share-alt text-xs text-accent"></i>
+                    <span class="text-xs text-primary">分享</span>
+                </button>
+
+                <!-- 分享菜单 - 仅保留复制链接 -->
+                <div id="shareModal" class="share-modal absolute left-0 right-0 bottom-full mb-2 bg-white rounded-1px shadow-xl p-2 z-10 hidden">
+                    <div class="flex flex-wrap gap-3 justify-center">
+                        <button class="share-platform" data-platform="link">
+                            <div class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-white mb-1">
+                                <i class="fa fa-link text-sm"></i>
+                            </div>
+                            <span class="text-xs">复制链接</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="bg-primary text-white mt-16 py-8">
+        <div class="container mx-auto px-4 max-w-6xl">
+            <div class="border-t border-gray-700 mt-6 pt-6 text-center text-gray-400 text-sm">
+                <p>© 2025 西安市档案馆 版权所有</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 音频元素 -->
+    <audio id="audioPlayer" src="./001.mp3"></audio>
+
+    <script src="../style/script.js"></script>
+</body>
+</html>
