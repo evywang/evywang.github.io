@@ -1,0 +1,42 @@
+/* 图片查看器样式 */
+#imageViewer {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+#imageViewer.active {
+    opacity: 1;
+}
+
+#viewerImage {
+    transform-origin: center center;
+    transition: transform 0.2s ease-out;
+    /* 移除pointer-events: none，让图片可以接收事件 */
+    /* user-select: none; 可选，保留或移除取决于是否需要禁止文本选择 */
+}
+
+/* 修改：只在主图片上保留pointer-events: none，查看器中的图片需要接收事件 */
+#mainImage {
+    pointer-events: none;
+}
+
+#imageContainer {
+    cursor: zoom-in;
+}
+
+#imageViewer {
+    cursor: zoom-out;
+}
+
+/* 图片控制按钮 */
+.image-control-btn {
+    transition: all 0.2s ease;
+}
+
+.image-control-btn:hover {
+    transform: scale(1.1);
+}
+
+.image-control-btn:active {
+    transform: scale(0.95);
+}

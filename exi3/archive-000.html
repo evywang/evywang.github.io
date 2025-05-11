@@ -2,11 +2,11 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>档案馆藏品展示</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link href="../style/styles.css" rel="stylesheet">
 </head>
 <body class="bg-neutral font-noto text-primary min-h-screen flex flex-col">
     <!-- 主容器 -->
@@ -17,17 +17,30 @@
             <div class="bg-customBg rounded-1px shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
                 <!-- 标题区域 - 居中显示 -->
                 <header class="p-6 sm:p-8 text-center">
-                    <h1 class="text-center text-3xl sm:text-4xl md:text-5xl font-bold text-primary mb-2 text-shadow tracking-tight">
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-primary mb-2 text-shadow tracking-tight">
                         历史之声
                     </h1>
-                    <p class="text-center text-secondary text-base sm:text-lg md:text-xl max-w-3xl">探索历史文物背后的故事与声音</p>
+                    <p class="text-secondary text-base sm:text-lg md:text-xl max-w-3xl">探索历史文物背后的故事与声音</p>
                 </header>
                 
-                <!-- 藏品图片 -->
-                <div class="relative aspect-video bg-gray-100 overflow-hidden">
+                <!-- 藏品图片 - 添加图片查看器功能 -->
+                <div class="relative aspect-video bg-gray-100 overflow-hidden cursor-zoom-in" id="imageContainer">
                     <img src="https://picsum.photos/1200/675?random=1" alt="珍贵藏品" 
-                         class="w-full h-full object-cover transition-transform duration-700 hover:scale-105">
+                         class="w-full h-full object-cover transition-transform duration-700 hover:scale-105" id="mainImage">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    
+                    <!-- 图片查看器控制按钮 -->
+                    <div class="absolute bottom-4 right-4 flex gap-2 z-10">
+                        <button id="zoomInBtn" class="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center shadow-md hover:bg-white transition-colors">
+                            <i class="fa fa-search-plus text-accent"></i>
+                        </button>
+                        <button id="zoomOutBtn" class="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center shadow-md hover:bg-white transition-colors">
+                            <i class="fa fa-search-minus text-accent"></i>
+                        </button>
+                        <button id="resetZoomBtn" class="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center shadow-md hover:bg-white transition-colors">
+                            <i class="fa fa-expand text-accent"></i>
+                        </button>
+                    </div>
                 </div>
                 
                 <!-- 音频控制 - 原型按钮 -->
@@ -119,9 +132,38 @@
         </div>
     </footer>
 
+    <!-- 图片查看器模态框 -->
+    <div id="imageViewer" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center">
+        <div class="absolute top-4 right-4 z-60">
+            <button id="closeViewerBtn" class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30 transition-colors">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="relative w-full h-full max-w-6xl mx-4">
+            <div id="viewerContainer" class="w-full h-full relative overflow-hidden">
+                <img src="https://picsum.photos/1200/675?random=1" alt="珍贵藏品" 
+                     class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-full max-h-full object-contain" id="viewerImage">
+            </div>
+        </div>
+        
+        <!-- 查看器控制按钮 -->
+        <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-3 z-60">
+            <button id="viewerZoomInBtn" class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30 transition-colors">
+                <i class="fa fa-search-plus"></i>
+            </button>
+            <button id="viewerZoomOutBtn" class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30 transition-colors">
+                <i class="fa fa-search-minus"></i>
+            </button>
+            <button id="viewerResetBtn" class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30 transition-colors">
+                <i class="fa fa-expand"></i>
+            </button>
+        </div>
+    </div>
+
     <!-- 音频元素 -->
     <audio id="audioPlayer" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
 
-    <script src="../style/script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
