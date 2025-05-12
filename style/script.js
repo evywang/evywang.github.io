@@ -1,158 +1,161 @@
-// DOM加载完成后执行
-document.addEventListener('DOMContentLoaded', function() {
-    // 获取DOM元素
-    const audioPlayer = document.getElementById('audioPlayer');
-    const playPauseBtn = document.getElementById('playPauseBtn');
-    const progressBar = document.getElementById('progressBar');
-    const progressHandle = document.getElementById('progressHandle');
-    const progressContainer = document.getElementById('progressContainer');
-    const currentTime = document.getElementById('currentTime');
-    const totalTime = document.getElementById('totalTime');
-    const descriptionContainer = document.getElementById('descriptionContainer');
-    const audioWave = document.getElementById('audioWave');
-    const shareButton = document.getElementById('shareButton');
-    const shareModal = document.getElementById('shareModal');
-    const sharePlatforms = document.querySelectorAll('.share-platform');
+// 播放/暂停按钮控制
+const playPauseBtn = document.getElementById('playPauseBtn');
+const playIcon = document.getElementById('playIcon');
+const pauseIcon = document.getElementById('pauseIcon');
+const audioPlayer = document.getElementById('audioPlayer');
 
-    // 音频播放控制
-    playPauseBtn.addEventListener('click', togglePlayPause);
-    audioPlayer.addEventListener('timeupdate', updateProgress);
-    audioPlayer.addEventListener('loadedmetadata', updateTotalTime);
-    progressContainer.addEventListener('click', seek);
-    audioPlayer.addEventListener('play', () => {
-        audioWave.classList.add('playing');
-        playPauseBtn.innerHTML = '<i class="fa fa-pause text-xl text-accent"></i>';
+// 检查音频是否可播放
+audioPlayer.addEventListener('canplay', () => {
+    console.log('音频已加载');
+    updateTimeDisplay();
+});
+
+// 先添加错误事件监听器
+audioPlayer.addEventListener('error', () => {
+    console.error('音频加载失败 - 详细错误信息:', {
+        errorCode: audioPlayer.error.code,
+        errorMessage: audioPlayer.error.message,
+        networkState: audioPlayer.networkState,
+        readyState: audioPlayer.readyState,
+        currentSrc: audioPlayer.currentSrc
     });
-    audioPlayer.addEventListener('pause', () => {
-        audioWave.classList.remove('playing');
-        playPauseBtn.innerHTML = '<i class="fa fa-play text-xl text-accent"></i>';
-    });
-
-    // 分享按钮点击事件
-    shareButton.addEventListener('click', (e) => {
-        e.stopPropagation();
-        shareModal.classList.toggle('hidden');
-        setTimeout(() => {
-            shareModal.classList.toggle('active');
-        }, 10);
-    });
-
-    // 点击其他区域关闭分享菜单
-    document.addEventListener('click', () => {
-        shareModal.classList.remove('active');
-        setTimeout(() => {
-            shareModal.classList.add('hidden');
-        }, 300);
-    });
-
-    // 阻止分享菜单内部点击冒泡
-    shareModal.addEventListener('click', (e) => {
-        e.stopPropagation();
-    });
-
-    // 分享平台点击事件
-    sharePlatforms.forEach(platform => {
-        platform.addEventListener('click', () => {
-            const platformType = platform.getAttribute('data-platform');
-            const shareLink = window.location.href;
-            const shareTitle = document.title;
-            const shareImage = 'https://picsum.photos/1200/675?random=1'; // 示例图片
-
-            shareModal.classList.remove('active');
-            setTimeout(() => {
-                shareModal.classList.add('hidden');
-            }, 300);
-
-            switch (platformType) {
-                case 'wechat':
-                    showToast('请使用微信客户端分享此页面');
-                    break;
-                case 'link':
-                    navigator.clipboard.writeText(shareLink).then(() => {
-                        showToast('链接已复制到剪贴板');
-                    }).catch(err => {
-                        showToast('复制失败，请手动复制链接');
-                        console.error('无法复制链接: ', err);
-                    });
-                    break;
+    playPauseBtn.disabled = true;
+    
+    // 检查文件是否存在
+    fetch(audioPlayer.src)
+        .then(response => {
+            console.log('音频文件HTTP状态:', response.status, response.statusText);
+            if (!response.ok) {
+                console.error('音频文件不存在或无法访问:', audioPlayer.src);
             }
+            return response.blob();
+        })
+        .then(blob => {
+            console.log('音频文件类型:', blob.type, '大小:', blob.size + ' bytes');
+        })
+        .catch(err => {
+            console.error('检查音频文件时出错:', err);
         });
-    });
+});
 
-    // 播放/暂停功能
-    function togglePlayPause() {
-        if (audioPlayer.paused || audioPlayer.ended) {
-            audioPlayer.play();
-            playPauseBtn.classList.add('animate-pulse');
-        } else {
-            audioPlayer.pause();
-            playPauseBtn.classList.remove('animate-pulse');
+// 监听元数据加载完成事件
+//console.log('正在尝试加载音频文件:', audioPlayer.src);
+audioPlayer.addEventListener('loadedmetadata', () => {
+    console.log('音频元数据已加载');
+    console.log('001.mp3元数据:', {
+        duration: audioPlayer.duration,
+        audioTracks: audioPlayer.audioTracks,
+        readyState: audioPlayer.readyState,
+        error: audioPlayer.error,
+        src: audioPlayer.src,
+        networkState: audioPlayer.networkState
+    });
+    if (!isNaN(audioPlayer.duration)) {
+        const duration = document.getElementById('duration');
+        if (duration) {
+            duration.textContent = formatTime(audioPlayer.duration);
         }
     }
+});
 
-    // 更新进度条
-    function updateProgress() {
-        const percent = (audioPlayer.currentTime / audioPlayer.duration) * 100;
-        progressBar.style.width = `${percent}%`;
-        progressHandle.style.left = `${percent}%`;
+audioPlayer.addEventListener('error', () => {
+    console.error('音频加载失败 - 详细错误信息:', {
+        errorCode: audioPlayer.error.code,
+        errorMessage: audioPlayer.error.message,
+        networkState: audioPlayer.networkState,
+        readyState: audioPlayer.readyState,
+        currentSrc: audioPlayer.currentSrc
+    });
+    playPauseBtn.disabled = true;
+    
+    // 检查文件是否存在
+    fetch(audioPlayer.src)
+        .then(response => {
+            console.log('音频文件HTTP状态:', response.status, response.statusText);
+            if (!response.ok) {
+                console.error('音频文件不存在或无法访问:', audioPlayer.src);
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            console.log('音频文件类型:', blob.type, '大小:', blob.size + ' bytes');
+        })
+        .catch(err => {
+            console.error('检查音频文件时出错:', err);
+        });
+});
+
+const audioWave = document.getElementById('audioWave');
+
+// 格式化时间为分钟:秒
+function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+}
+
+// 更新时间显示
+function updateTimeDisplay() {
+    const currentTime = document.getElementById('currentTime');
+    const duration = document.getElementById('duration');
+    
+    if (currentTime) {
         currentTime.textContent = formatTime(audioPlayer.currentTime);
     }
-
-    // 更新总时长
-    function updateTotalTime() {
-        totalTime.textContent = formatTime(audioPlayer.duration);
+    if (duration && !isNaN(audioPlayer.duration)) {
+        duration.textContent = formatTime(audioPlayer.duration);
     }
+}
 
-    // 进度条点击跳转
-    function seek(e) {
-        const width = progressContainer.clientWidth;
-        const clickX = e.offsetX;
-        const duration = audioPlayer.duration;
-        audioPlayer.currentTime = (clickX / width) * duration;
+// 监听时间更新
+audioPlayer.addEventListener('timeupdate', updateTimeDisplay);
+
+playPauseBtn.addEventListener('click', () => {
+    if (audioPlayer.paused) {
+        audioPlayer.play().then(() => {
+            playIcon.classList.add('hidden');
+            pauseIcon.classList.remove('hidden');
+            audioWave.classList.add('playing');
+        }).catch(error => {
+            console.error('播放失败:', error);
+        });
+    } else {
+        audioPlayer.pause();
+        playIcon.classList.remove('hidden');
+        pauseIcon.classList.add('hidden');
+        audioWave.classList.remove('playing');
     }
+});
 
-    // 时间格式化
-    function formatTime(seconds) {
-        const minutes = Math.floor(seconds / 60);
-        seconds = Math.floor(seconds % 60);
-        return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+// 分享按钮点击事件
+const shareButton = document.getElementById('shareButton');
+const shareModal = document.getElementById('shareModal');
+
+shareButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isHidden = shareModal.classList.contains('hidden');
+    shareModal.classList.toggle('hidden', !isHidden);
+    shareModal.classList.toggle('active', isHidden);
+    shareButton.setAttribute('aria-expanded', isHidden);
+});
+
+// 复制链接按钮点击事件
+document.querySelector('.share-platform[data-platform="link"]').addEventListener('click', async () => {
+    try {
+        await navigator.clipboard.writeText(window.location.href);
+        //alert('链接已复制到剪贴板');
+    } catch (err) {
+        console.error('复制失败:', err);
+        //alert('复制失败，请手动复制链接');
     }
+    shareModal.classList.add('hidden');
+    shareButton.setAttribute('aria-expanded', false);
+});
 
-    // 显示提示消息
-    function showToast(message) {
-        // 检查是否已存在toast
-        let toast = document.querySelector('.toast');
-        if (toast) {
-            document.body.removeChild(toast);
-        }
-        
-        // 创建toast元素
-        toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.textContent = message;
-        
-        // 添加到页面
-        document.body.appendChild(toast);
-        
-        // 显示动画
-        setTimeout(() => {
-            toast.classList.add('active');
-        }, 10);
-        
-        // 自动消失
-        setTimeout(() => {
-            toast.classList.remove('active');
-            setTimeout(() => {
-                document.body.removeChild(toast);
-            }, 300);
-        }, 3000);
+// 点击其他地方关闭分享菜单
+document.addEventListener('click', (e) => {
+    if (!shareButton.contains(e.target) && !shareModal.contains(e.target)) {
+        shareModal.classList.add('hidden');
+        shareButton.setAttribute('aria-expanded', false);
     }
-
-    // 监听滚动事件
-    descriptionContainer.addEventListener('scroll', () => {
-        const scrollTop = descriptionContainer.scrollTop;
-        const scrollHeight = descriptionContainer.scrollHeight;
-        const clientHeight = descriptionContainer.clientHeight;
-        const scrollPercent = (scrollTop / (scrollHeight - clientHeight)) * 100;
-    });
 });
