@@ -144,7 +144,7 @@ body {
 
 .share-modal {
     transform: scale(0.9) translateY(10px);
-    opacity: 0;
+    /*opacity: 0;*/
     transition: all 0.3s ease;
 }
 
