@@ -42,7 +42,7 @@ audioPlayer.addEventListener('error', () => {
 //console.log('正在尝试加载音频文件:', audioPlayer.src);
 audioPlayer.addEventListener('loadedmetadata', () => {
     console.log('音频元数据已加载');
-    console.log('001.mp3元数据:', {
+    console.log('audio 元数据:', {
         duration: audioPlayer.duration,
         audioTracks: audioPlayer.audioTracks,
         readyState: audioPlayer.readyState,
@@ -98,12 +98,17 @@ function formatTime(seconds) {
 function updateTimeDisplay() {
     const currentTime = document.getElementById('currentTime');
     const duration = document.getElementById('duration');
+    const progressHandle = document.getElementById('progressHandle');
     
     if (currentTime) {
         currentTime.textContent = formatTime(audioPlayer.currentTime);
     }
     if (duration && !isNaN(audioPlayer.duration)) {
         duration.textContent = formatTime(audioPlayer.duration);
+    }
+    if (progressHandle && !isNaN(audioPlayer.duration)) {
+        const progressPercent = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+        progressHandle.style.left = `${progressPercent}%`;
     }
 }
 
