@@ -1,0 +1,16 @@
+二维码页面部署路径
+
+1. 包解压到web 页文件夹 wszl/zb 目录下
+
+解压后目录结构如下
+wszl
+     |-  zb
+           |-  dyzb
+           |-  dezb
+           |-  dszb
+
+
+
+2. 验证 
+   从  https://www.xadaj.gov.cn/wszl/zb/dyzb/index.html  可以正确访问到第一展板html 页面.
+

@@ -5,10 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>西安市档案馆西安珍贵档案文献陈列展</title>
-    <link href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link href="../style/styles.css" rel="stylesheet">
-    <script src="../script/vue.global.prod.js"></script>
-    <script src="../script/axios.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/3.5.0/vue.global.prod.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/1.8.4/axios.min.js"></script>
 </head>
 
 <body class="bg-neutral text-primary min-h-screen flex flex-col">
@@ -132,8 +132,11 @@
                         this.descriptionLines = lines.slice(1);
                     } catch (error) {
                         console.error('Error loading text content:', error);
-                        this.title = '清代档案文献';
-                        this.descriptionLines = ['清代中晚期的西安，为西北地区政治经济文化中心和军事重镇...',];
+                        this.id = '001';
+                        this.$nextTick(() => {
+                            this.loadTextContent();
+                            this.setupAudioPlayer();
+                        });
                     }
                 },
                 setupAudioPlayer() {
