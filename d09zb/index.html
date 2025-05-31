@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>西安市档案馆西安珍贵档案文献陈列展</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../style/styles.css" rel="stylesheet">
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/3.5.0/vue.global.prod.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/1.8.4/axios.min.js"></script>
+</head>
+
+<body class="bg-neutral text-primary min-h-screen flex flex-col">
+    <div id="app" class="container mx-auto px-4 py-8 max-w-6xl">
+        <main>
+            <div class="bg-customBg rounded-1px shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
+                <header class="p-0.75 sm:p-1 text-center">
+                    <h1 class="text-center text-2xl sm:text-3xl md:text-4xl text-primary mb-4 text-shadow tracking-tight"
+                        style="color: rgb(106, 89, 63);">
+                        {{ title }}
+                    </h1>
+                </header>
+
+                <div class="relative aspect-video bg-gray-100 overflow-hidden">
+                    <img :src="id + '.jpg'" :alt="title" loading="lazy"
+                        class="w-full h-full transition-transform duration-700 hover:scale-105 bg-customBg">
+                </div>
+
+                <div class="flex justify-center items-center p-1.5 pd-2">
+                    <button id="playPauseBtn" class="prototype-button py-8" style="color: white;" aria-label="播放/暂停音频"
+                        aria-controls="audioPlayer">
+                        <i class="fa fa-play text-xl text-accent" style="color: white;" id="playIcon"></i>
+                        <i class="fa fa-pause text-xl text-accent hidden" style="color: white;" id="pauseIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-4 mt-4 rounded-1px">
+                <div class="flex items-center gap-3">
+                    <div id="audioWave" class="audio-wave mr-4" style="color: white;">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <span id="currentTime" class="text-sm text-secondary">0:00</span>
+                    <div class="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden cursor-pointer group"
+                        id="progressContainer">
+                        <div id="progressBar"
+                            class="absolute top-0 left-0 h-full bg-accent w-0 rounded-full transition-all duration-150">
+                        </div>
+                        <div id="progressHandle"
+                            class="absolute top-1/2 left-0 w-4 h-4 bg-white rounded-1px shadow-md transform -translate-y-1/2 -translate-x-1/2 scale-0 group-hover:scale-100 transition-all duration-150">
+                        </div>
+                    </div>
+                    <span id="totalTime" class="text-sm text-secondary">0:00</span>
+                </div>
+            </div>
+
+            <div class="rounded-1px">
+                <div class="inline-block">
+                    <h2 class="text-2xl sm:text-3xl font-semibold text-primary">详情介绍</h2>
+                    <div class="title-underline"></div>
+                </div>
+                <div class="h-64 md:h-80 overflow-y-auto pr-2 scrollbar-hide" id="descriptionContainer">
+                    <template v-for="(line, index) in descriptionLines" :key="index">
+                        <p class="text-gray-700 leading-relaxed mb-4 indented-text">
+                            {{ line }}
+                        </p>
+                    </template>
+                </div>
+            </div>
+
+            <div class="p-3 rounded-1px shadow-lg relative">
+                <button id="shareButton" class="share-button-prototype" aria-label="分享此页面" aria-haspopup="true"
+                    aria-expanded="false">
+                    <i class="fa fa-share-alt text-xs text-accent"></i>
+                    <span class="text-xs text-primary">分享</span>
+                </button>
+                <div id="shareModal"
+                    class="share-modal absolute left-0 right-0 bottom-full mb-2 bg-white rounded-1px shadow-xl p-2 z-10 hidden">
+                    <div class="flex flex-wrap gap-3 justify-center">
+                        <button class="share-platform" data-platform="link">
+                            <div
+                                class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-white mb-1">
+                                <i class="fa fa-link text-sm"></i>
+                            </div>
+                            <span class="text-xs">复制链接</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <audio id="audioPlayer" :src="id + '.mp3'"></audio>
+    </div>
+
+    <footer class="bg-primary text-white mt-16 py-8">
+        <div class="container mx-auto px-4 max-w-6xl">
+            <div class="border-t border-gray-700 mt-6 pt-6 text-center text-gray-400 text-sm">
+                <p>© 2025 西安市档案馆 版权所有</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    id: '001',
+                    title: '',
+                    descriptionLines: []
+                }
+            },
+            mounted() {
+                const urlId = new URLSearchParams(window.location.search).get('id');
+                if (urlId) this.id = urlId;
+                this.loadTextContent();
+                this.$nextTick(() => {
+                    this.setupAudioPlayer();
+                });
+            },
+            methods: {
+                async loadTextContent() {
+                    try {
+                        const response = await axios.get(`${this.id}.txt`);
+                        const lines = response.data.split('\n');
+                        this.title = lines[0];
+                        this.descriptionLines = lines.slice(1);
+                    } catch (error) {
+                        console.error('Error loading text content:', error);
+                        this.id = '001';
+                        this.$nextTick(() => {
+                            this.loadTextContent();
+                            this.setupAudioPlayer();
+                        });
+                    }
+                },
+                setupAudioPlayer() {
+                    const audioPlayer = document.getElementById('audioPlayer');
+                    const playPauseBtn = document.getElementById('playPauseBtn');
+                    const playIcon = document.getElementById('playIcon');
+                    const pauseIcon = document.getElementById('pauseIcon');
+                    const progressBar = document.getElementById('progressBar');
+                    const progressContainer = document.getElementById('progressContainer');
+                    const currentTimeDisplay = document.getElementById('currentTime');
+                    const totalTimeDisplay = document.getElementById('totalTime');
+
+                    // 在元数据加载完成后立即显示音频总时长
+                    audioPlayer.addEventListener('loadedmetadata', () => {
+                        if (!isNaN(audioPlayer.duration)) {
+                            totalTimeDisplay.textContent = formatTime(audioPlayer.duration);
+                        }
+                    });
+
+                    // 播放/暂停控制
+                    playPauseBtn.addEventListener('click', () => {
+                        if (audioPlayer.paused) {
+                            audioPlayer.play();
+                            playIcon.classList.add('hidden');
+                            pauseIcon.classList.remove('hidden');
+                            document.getElementById('audioWave').classList.add('playing');
+                        } else {
+                            audioPlayer.pause();
+                            playIcon.classList.remove('hidden');
+                            pauseIcon.classList.add('hidden');
+                            document.getElementById('audioWave').classList.remove('playing');
+                        }
+                    });
+
+                    // 更新进度条
+                    audioPlayer.addEventListener('timeupdate', () => {
+                        const currentTime = audioPlayer.currentTime;
+                        const duration = audioPlayer.duration;
+                        const progressPercent = (currentTime / duration) * 100;
+                        progressBar.style.width = `${progressPercent}%`;
+
+                        // 更新进度手柄位置
+                        const progressHandle = document.getElementById('progressHandle');
+                        progressHandle.style.left = `${progressPercent}%`;
+
+                        // 更新时间显示
+                        currentTimeDisplay.textContent = formatTime(currentTime);
+                        if (!isNaN(duration)) {
+                            totalTimeDisplay.textContent = formatTime(duration);
+                        }
+                    });
+
+                    // 点击进度条跳转
+                    progressContainer.addEventListener('click', (e) => {
+                        const rect = progressContainer.getBoundingClientRect();
+                        const clickX = e.clientX - rect.left;
+                        const width = rect.width;
+
+                        // 检查音频是否已准备好
+                        if (audioPlayer.readyState >= 1) { // HAVE_ENOUGH_DATA
+                            const duration = audioPlayer.duration;
+                            if (!isNaN(duration)) {
+                                const seekTime = (clickX / width) * duration;
+                                audioPlayer.currentTime = seekTime;
+                                console.log('跳转时间:', seekTime, '设置后的currentTime:', audioPlayer.currentTime);
+
+                                // 如果音频当前是暂停状态，点击后自动播放
+                                if (audioPlayer.paused) {
+                                    audioPlayer.play();
+                                    playIcon.classList.add('hidden');
+                                    pauseIcon.classList.remove('hidden');
+                                    document.getElementById('audioWave').classList.add('playing');
+                                }
+                            }
+                        } else {
+                            // 如果音频未准备好，先加载元数据
+                            audioPlayer.addEventListener('loadedmetadata', () => {
+                                const duration = audioPlayer.duration;
+                                if (!isNaN(duration)) {
+                                    const seekTime = (clickX / width) * duration;
+                                    audioPlayer.currentTime = seekTime;
+                                    console.log('跳转时间:', seekTime, '设置后的currentTime:', audioPlayer.currentTime);
+
+                                    if (audioPlayer.paused) {
+                                        audioPlayer.play();
+                                        playIcon.classList.add('hidden');
+                                        pauseIcon.classList.remove('hidden');
+                                        document.getElementById('audioWave').classList.add('playing');
+                                    }
+                                }
+                            }, { once: true });
+                        }
+                    });
+
+                    // 格式化时间显示
+                    function formatTime(seconds) {
+                        const mins = Math.floor(seconds / 60);
+                        const secs = Math.floor(seconds % 60);
+                        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                    }
+
+                    // 音频播放结束事件
+                    audioPlayer.addEventListener('ended', () => {
+                        playIcon.classList.remove('hidden');
+                        pauseIcon.classList.add('hidden');
+                        progressBar.style.width = '0%';
+                        document.getElementById('progressHandle').style.left = '0%';
+                        currentTimeDisplay.textContent = '0:00';
+                        document.getElementById('audioWave').classList.remove('playing');
+                    });
+                }
+            }
+        }).mount('#app');
+
+        // 分享按钮点击事件
+        const shareButton = document.getElementById('shareButton');
+        const shareModal = document.getElementById('shareModal');
+
+        shareButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isHidden = shareModal.classList.contains('hidden');
+            shareModal.classList.toggle('hidden');
+            shareButton.setAttribute('aria-expanded', !isHidden);
+            
+            // 确保菜单显示在正确位置
+            if (!isHidden) {
+                const buttonRect = shareButton.getBoundingClientRect();
+                shareModal.style.bottom = `${window.innerHeight - buttonRect.top + 10}px`;
+            }
+        });
+
+        // 复制链接按钮点击事件
+        document.querySelector('.share-platform[data-platform="link"]').addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(window.location.href);
+                //alert('链接已复制到剪贴板');
+            } catch (err) {
+                console.error('复制失败:', err);
+                //alert('复制失败，请手动复制链接');
+            }
+            shareModal.classList.add('hidden');
+            shareButton.setAttribute('aria-expanded', false);
+        });
+
+        // 点击其他地方关闭分享菜单
+        document.addEventListener('click', (e) => {
+            if (!shareButton.contains(e.target) && !shareModal.contains(e.target)) {
+                shareModal.classList.add('hidden');
+                shareButton.setAttribute('aria-expanded', false);
+            }
+        });
+    </script>
+</body>
+
+</html>
